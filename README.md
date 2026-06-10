@@ -11,7 +11,8 @@ Built in layers, each a model we can compare:
 1. **Bias baseline** — `r̂ = μ + b_u + b_i` (regularized). Backbone for everything else.
 2. **Biased matrix factorization** — `r̂ = μ + b_u + b_i + pᵤ·qᵢ`, SGD over observed
    entries (PyTorch, GPU). The low-rank model.
-3. **Second model** (in a separate notebook) — item-kNN / ALS, for the mandatory comparison.
+3. **Item-item kNN** (`netflix_knn.ipynb`) — cosine similarity on baseline residuals with
+   co-rating shrinkage + denominator shrinkage, for the mandatory comparison.
 4. **Ensemble blend** — ridge over model predictions. The historical Prize lesson:
    blends beat any single model.
 
@@ -21,7 +22,8 @@ Built in layers, each a model we can compare:
 netflix-prize/
 ├── notebooks/
 │   └── netflix_prize.ipynb     # baseline + MF + evaluation + Top-K + blend
-│   └── (planned) model2.ipynb  # item-kNN / ALS comparison
+│   └── netflix_knn.ipynb       # item-kNN comparison model (built by build_nb2.py)
+├── build_nb2.py                # regenerates notebooks/netflix_knn.ipynb
 ├── sanity_check.py             # torch-free pipeline check (parse → baseline → MAP@10)
 ├── data/                       # gitignored — see "Data" below
 ├── requirements.txt
