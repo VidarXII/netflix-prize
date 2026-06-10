@@ -1,0 +1,20 @@
+# Data & caches — multi-GB, never commit. Download instructions in README.
+data/
+*.npz
+*.pt
+*.pth
+*.ckpt
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
