@@ -22,6 +22,16 @@ cells.append(md(
 
 cells.append(md("## 0. Setup + load"))
 cells.append(code(
+"# --- Colab only: mount Drive and/or unzip the dataset. Skip if running locally. ---\n"
+"try:\n"
+"    from google.colab import drive\n"
+"    drive.mount('/content/drive')\n"
+"    # Example: unzip the archive you uploaded to Drive into /content/netflix\n"
+"    # !mkdir -p /content/netflix\n"
+"    # !unzip -o '/content/drive/MyDrive/archive.zip' -d /content/netflix\n"
+"except Exception as e:\n"
+"    print('Not on Colab (or skip):', e)"))
+cells.append(code(
 "import os, time\n"
 "import numpy as np\n"
 "import pandas as pd\n"
