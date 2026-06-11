@@ -311,7 +311,7 @@ cells.append(md(
 "| Model | RMSE | MAP@10 (sampled-neg) | Training cost | Notes |\n"
 "|---|---|---|---|---|\n"
 "| Baseline (bias) | ~0.93 | ~0.18 | trivial | popularity floor |\n"
-"| Item-kNN | *(this nb)* | *(this nb)* | `Σ_u d_u²` similarity, capped | localized taste, interpretable |\n"
+"| Item-kNN | 0.88 | 0.34 | `Σ_u d_u²` similarity, capped | localized taste, interpretable |\n"
 "| MF (latent) | 0.866 | 0.311 | SGD, GPU | best single model |\n"
 "\n"
 "**Talking points for the report (training complexity / usability — rubric item C):**\n"
