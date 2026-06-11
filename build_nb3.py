@@ -137,7 +137,7 @@ cells.append(code(
 "\n"
 "def group_top(mask, n_group, k=12, min_ratings=50):\n"
 "    c = np.bincount(movie[mask], minlength=n_movies)\n"
-"    s = np.bincount(movie[mask], weights=rating_f, minlength=n_movies)\n"
+"    s = np.bincount(movie[mask], weights=rating_f[mask], minlength=n_movies)\n"
 "    m = np.divide(s, c, out=np.zeros_like(s), where=c>0)\n"
 "    keep = np.where(c >= min_ratings)[0]\n"
 "    top = keep[np.argsort(-(c[keep] / n_group))][:k]\n"
