@@ -21,9 +21,10 @@ Built in layers, each a model we can compare:
 ```
 netflix-prize/
 ├── notebooks/
-│   └── netflix_prize.ipynb     # baseline + MF + evaluation + Top-K + blend
+│   └── netflix_prize.ipynb     # baseline + MF + evaluation + Top-K (temperature) + blend
 │   └── netflix_knn.ipynb       # item-kNN comparison model (built by build_nb2.py)
-├── build_nb2.py                # regenerates notebooks/netflix_knn.ipynb
+│   └── netflix_eda.ipynb       # extended EDA (built by build_nb3.py)
+├── build_nb2.py / build_nb3.py # regenerate the notebooks above
 ├── sanity_check.py             # torch-free pipeline check (parse → baseline → MAP@10)
 ├── data/                       # gitignored — see "Data" below
 ├── requirements.txt
@@ -58,7 +59,7 @@ python sanity_check.py
 3. Set `DATA_DIR` in the config cell; mount Drive / unzip the dataset.
 4. Run all. Parsing caches to `ratings_cache.npz` so reruns skip it.
 
-For fast local iteration, set `SUBSAMPLE_FILES=[1]` and `FRAC=0.2` in the config cell.
+For fast local iteration, set `SUBSAMPLE_FILES=[1]` and `USER_FRAC=0.35` in the config cell.
 
 ## Evaluation
 
@@ -71,12 +72,26 @@ For fast local iteration, set `SUBSAMPLE_FILES=[1]` and `FRAC=0.2` in the config
 **Split:** per-user temporal holdout — each user's most recent 20% of ratings are the
 test set (predict the future from the past).
 
-### Current results (`combined_data_1.txt`, bias baseline)
+### Results
 
-| Metric | Value |
-| --- | --- |
-| RMSE | 0.930 |
-| MAP@10 (sampled negatives) | 0.176 |
-| MAP@10 (held-out only) | 0.793 |
+| Model | RMSE | MAP@10 (sampled-neg) |
+| --- | --- | --- |
+| Matrix factorization (MF) | **0.86** | 0.31 |
+| Item-item kNN | 0.88 | **0.34** |
 
-MF and the second model fill in the rest of the comparison table.
+**Rating accuracy ≠ ranking quality.** MF wins on RMSE (0.86 vs 0.88), but item-kNN is the
+**better ranking model** — it gets a higher MAP@10 (0.34 vs 0.31). MF predicts the rating
+value more precisely, while the neighborhood model orders each user's top items better. This
+is exactly the rating-vs-ranking trade-off the brief asks us to discuss: the model you pick
+depends on whether the product needs accurate scores or a good Top-K list.
+
+## Key findings (EDA)
+
+- **Movie title length shows no consistent trend over release years** — title length is not
+  a useful signal for popularity or era.
+- **Cinephiles vs. newbies have distinct taste.** Heavy raters (>100 ratings) skew toward
+  **franchise entries and classic films**; newbies (<10 ratings) skew toward **rom-coms** and
+  recent mainstream hits. (Motivates cold-start handling and explains why personalization
+  helps power users most.)
+- **Star Wars films are the highest-rated 1980s movies** as rated in the 2000s — a clear case
+  of older titles sustaining strong appeal decades after release.

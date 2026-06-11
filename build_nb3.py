@@ -1,4 +1,4 @@
-"""Builds notebooks/netflix_eda.ipynb (extended EDA + top-25/month CSV export).
+"""Builds notebooks/netflix_eda.ipynb (extended EDA).
 Run once: python build_nb3.py"""
 import json
 
@@ -14,7 +14,6 @@ cells.append(md(
 "1. Average **title length** of the top-5 movies per release year\n"
 "2. **Comeback** movies — old titles whose ratings surge late in the window\n"
 "3. Tastes of **heavy raters (>100)** vs **newbies (<10)**\n"
-"4. CSV export: **top-25 highest-rated movies per month** (for an IMDB join)\n"
 "\n"
 "Note: rating timestamps span ~2000-2005; movie *release years* go back decades — a\n"
 "separate field. All analyses are vectorized with `np.bincount` so they run on the full\n"
@@ -117,7 +116,7 @@ cells.append(md(
 "the window + a strong surge in the second half + high average rating. `surge = late/early`.\n"
 "\n"
 "> We can't see original box-office here (no external data), so 'failure -> comeback' is a\n"
-"> proxy. Joining IMDB/box-office data (see Section 4) would let you confirm the flop part."))
+"> proxy. Joining external IMDB/box-office data would let you confirm the flop part."))
 cells.append(code(
 "mo = date.astype('datetime64[M]')\n"
 "half = mo.min() + (mo.max() - mo.min()) // 2\n"
@@ -160,40 +159,6 @@ cells.append(code(
 "print(group_top(row_newb, n_newb).to_string(index=False))"))
 
 cells.append(md(
-"## 4. Export: top-25 highest-rated movies per month -> CSV\n"
-"\n"
-"For each month, the 25 movies with the highest average rating among those with at least\n"
-"`MIN_RATINGS` ratings that month. Saved to `DATA_DIR/top25_per_month.csv` — join it to\n"
-"IMDB on `(title, year)` for language / genre / theme analysis.\n"
-"\n"
-"On Colab, download with: `from google.colab import files; files.download(out_path)`."))
-cells.append(code(
-"MIN_RATINGS = 50\n"
-"month_codes, month_idx = np.unique(mo, return_inverse=True)\n"
-"M = len(month_codes)\n"
-"key  = month_idx.astype(np.int64) * n_movies + movie\n"
-"cnt  = np.bincount(key, minlength=M*n_movies).reshape(M, n_movies)\n"
-"ssum = np.bincount(key, weights=rating_f, minlength=M*n_movies).reshape(M, n_movies)\n"
-"mean = np.divide(ssum, cnt, out=np.zeros_like(ssum), where=cnt>0)\n"
-"\n"
-"rows = []\n"
-"for mi in range(M):\n"
-"    valid = np.where(cnt[mi] >= MIN_RATINGS)[0]\n"
-"    if len(valid) == 0:\n"
-"        continue\n"
-"    order = valid[np.argsort(-mean[mi, valid])][:25]   # ties broken by index\n"
-"    for rank, mid in enumerate(order, 1):\n"
-"        rows.append((str(month_codes[mi]), rank, mid + 1,\n"
-"                     round(float(mean[mi, mid]), 4), int(cnt[mi, mid])))\n"
-"out = pd.DataFrame(rows, columns=['month','rank','movie_id','avg_rating','n_ratings'])\n"
-"out = out.merge(titles[['movie_id','year','title']], on='movie_id', how='left')\n"
-"out = out[['month','rank','movie_id','title','year','n_ratings','avg_rating']]\n"
-"out_path = os.path.join(DATA_DIR, 'top25_per_month.csv')\n"
-"out.to_csv(out_path, index=False)\n"
-"print(f'wrote {len(out):,} rows ({M} months) -> {out_path}')\n"
-"out.head(10)"))
-
-cells.append(md(
 "## Notes for the report\n"
 "\n"
 "- **Title length**: feeds EDA (15%) and 'interesting observations'. Pair with a\n"
@@ -201,9 +166,7 @@ cells.append(md(
 "- **Comebacks**: the surge metric + the IMDB join (box office vs. Netflix-era ratings)\n"
 "  is a strong 'innovation' angle.\n"
 "- **Heavy vs newbie**: motivates cold-start (newbies cluster on a few recent hits) and\n"
-"  explains why personalization helps power users more.\n"
-"- **top25_per_month.csv**: the IMDB join unlocks language / genre / theme breakdowns the\n"
-"  raw dataset can't give."))
+"  explains why personalization helps power users more."))
 
 nb = {"cells": cells,
       "metadata": {"colab": {"provenance": []},
